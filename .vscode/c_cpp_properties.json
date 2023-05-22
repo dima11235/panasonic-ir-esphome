@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "D:/esphome",
-                "D:/panasonic-ir-esphome/components/panasonic"
+                "D:/panasonic-ir-esphome/components/panasonic",
+                "D:/ArduinoJson/src "
             ],
             "defines": [
                 "_DEBUG",
