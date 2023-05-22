@@ -50,12 +50,13 @@ const uint8_t PANASONIC_STATE_FRAME_SIZE = 27;
 class PanasonicClimate : public climate_ir::ClimateIR {
  public:
   PanasonicClimate()
-      : climate_ir::ClimateIR(PANASONIC_TEMP_MIN, PANASONIC_TEMP_MAX, 1.0f, true, false,
-                              {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW,
-                               climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
-                              {/*climate::CLIMATE_SWING_HIGHEST, climate::CLIMATE_SWING_HIGH, climate::CLIMATE_SWING_MIDDLE,
-                               climate::CLIMATE_SWING_LOW, climate::CLIMATE_SWING_LOWEST, climate::CLIMATE_SWING_AUTO*/
-                               climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}) {}
+      : climate_ir::ClimateIR(
+            PANASONIC_TEMP_MIN, PANASONIC_TEMP_MAX, 1.0f, true, false,
+            {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW,
+             climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
+            {/*climate::CLIMATE_SWING_HIGHEST, climate::CLIMATE_SWING_HIGH, climate::CLIMATE_SWING_MIDDLE,
+               climate::CLIMATE_SWING_LOW, climate::CLIMATE_SWING_LOWEST, climate::CLIMATE_SWING_AUTO*/
+             climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}) {}
 
  protected:
   /// Update the traits of this controller.

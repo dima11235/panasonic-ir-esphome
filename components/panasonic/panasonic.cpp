@@ -118,6 +118,7 @@ uint16_t PanasonicClimate::fan_speed_() {
     default:
       fan_speed = PANASONIC_FAN_AUTO << 8;
   }
+
   switch (this->swing_mode) {
     /*
     case climate::CLIMATE_SWING_HIGHEST:
@@ -227,6 +228,7 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
       this->swing_mode = climate::CLIMATE_SWING_OFF;
       break;
   }
+  
   switch (fan_mode & 0xF0) {
     case PANASONIC_FAN_1:
     case PANASONIC_FAN_2:
