@@ -1,7 +1,7 @@
-# Panasonic-Air-Ir-ESP-Home
+# Panasonic-Ir-ESPHome
 
 Panaasonic Climat IR компонент для ESP Home.
-Сделано под пульт A75C3747.
+Сделано под пульт ARC43XXX.
 
 ##### Не реализовано:
 - таймер;
@@ -10,24 +10,38 @@ Panaasonic Climat IR компонент для ESP Home.
 ##### YAML для добавления в конфигурацию ESP Home
 ```
 external_components:
-  - source: github://flight4287/panasonic-air-ir-esphome
+  - source: github://dima11235/panasonic-ir-esphome@main
+    refresh: 0s
+    components: [ panasonic ]
 
 remote_transmitter:
-  pin: D3
+  pin: GPIO14
   carrier_duty_percent: 50%
   
 remote_receiver:
   id: receiver
   pin:
-    number: D5
+    number: GPIO05
     inverted: True
     mode: INPUT_PULLUP
   tolerance: 55%
   
 climate:
   - platform: panasonic
-    name: "Living Room AC"
+    id: my_climate
+    name: "Livingroom AC"
+    sensor: current_temperature
     receiver_id: receiver
+
+sensor:
+  - platform: homeassistant
+    id: current_temperature
+    entity_id: sensor.livingroom_temperature
+    unit_of_measurement: "°C"
+    icon: "mdi:temperature"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 1
 
 ```
 
