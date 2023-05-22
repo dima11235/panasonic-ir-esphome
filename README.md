@@ -1,7 +1,7 @@
 # Panasonic-Ir-ESPHome
 
-Panaasonic Climat IR компонент для ESP Home.
-Сделано под пульт ARC43XXX.
+Panasonic Climat IR компонент для ESP Home.
+Сделано под кондиционер Panasonic CS-E12MKDW.
 
 ##### Не реализовано:
 - таймер;
@@ -46,5 +46,5 @@ sensor:
 ```
 
 
-За основу взят код от компонента Daikin https://github.com/esphome/esphome/tree/dev/esphome/components/daikin
+За основу взята версия кода https://github.com/flight4287/panasonic-air-ir-esphome
 
