@@ -2,10 +2,7 @@
 
 Panasonic Climat IR компонент для ESP Home.
 Сделано под кондиционер Panasonic CS-E12MKDW.
-
-##### Не реализовано:
-- таймер;
-- режим управления потоком воздуха (в ESP Home нет состояний кроме VERTICAL/HORIZONTAL/BOTH/OFF).
+За основу взята версия кода https://github.com/flight4287/panasonic-air-ir-esphome
 
 ##### YAML для добавления в конфигурацию ESP Home
 ```
@@ -44,7 +41,3 @@ sensor:
     accuracy_decimals: 1
 
 ```
-
-
-За основу взята версия кода https://github.com/flight4287/panasonic-air-ir-esphome
-
