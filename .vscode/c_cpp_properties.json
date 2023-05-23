@@ -4,9 +4,9 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:/esphome",
-                "D:/panasonic-ir-esphome/components/panasonic",
-                "D:/ArduinoJson/src"
+                "D:/dev/esphome",
+                "D:/dev/panasonic-ir-esphome/components/panasonic",
+                "D:/dev/ArduinoJson/src"
             ],
             "defines": [
                 "_DEBUG",
