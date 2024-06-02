@@ -6,6 +6,7 @@ namespace panasonic {
 
 static const char *TAG = "panasonic.climate";
 
+/*
 climate::ClimateTraits PanasonicClimate::traits() {
   auto traits = climate::ClimateTraits();
   traits.set_supports_current_temperature(this->sensor_ != nullptr);
@@ -28,6 +29,7 @@ climate::ClimateTraits PanasonicClimate::traits() {
   traits.set_supported_presets(this->presets_);
   return traits;
 }
+*/
 
 void PanasonicClimate::transmit_state() {
   uint8_t remote_state[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,

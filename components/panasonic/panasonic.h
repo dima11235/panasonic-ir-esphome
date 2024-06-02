@@ -58,8 +58,10 @@ class PanasonicClimate : public climate_ir::ClimateIR {
 
  protected:
   /// Update the traits of this controller.
+  /*
   climate::ClimateTraits traits() override;
-
+  */
+ 
   // Transmit via IR the state of this climate controller.
   void transmit_state() override;
   uint8_t operation_mode_();
