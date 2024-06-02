@@ -11,7 +11,7 @@ const uint8_t PANASONIC_TEMP_MIN = 16;  // Celsius
 const uint8_t PANASONIC_TEMP_MAX = 30;  // Celsius
 
 // Modes
-const uint8_t PANASONIC_MODE_AUTO = 0x00;
+const uint8_t PANASONIC_MODE_AUTO = 0x01;
 const uint8_t PANASONIC_MODE_COOL = 0x30;
 const uint8_t PANASONIC_MODE_HEAT = 0x40;
 const uint8_t PANASONIC_MODE_DRY = 0x20;
@@ -52,16 +52,10 @@ class PanasonicClimate : public climate_ir::ClimateIR {
   PanasonicClimate()
       : climate_ir::ClimateIR(
             PANASONIC_TEMP_MIN, PANASONIC_TEMP_MAX, 1.0f, true, false,
-            {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW,
-             climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
+            {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
             {climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}) {}
 
  protected:
-  /// Update the traits of this controller.
-  /*
-  climate::ClimateTraits traits() override;
-  */
- 
   // Transmit via IR the state of this climate controller.
   void transmit_state() override;
   uint8_t operation_mode_();
