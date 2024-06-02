@@ -100,6 +100,7 @@ uint16_t PanasonicClimate::fan_speed_() {
       fan_speed |= 0xF00;
       break;
     default:
+      // set PANASONIC_SWING_HIGHEST position
       fan_speed |= 0x100;
       break;
   }
