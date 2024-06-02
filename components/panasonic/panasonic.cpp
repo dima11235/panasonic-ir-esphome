@@ -151,21 +151,6 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
   
   uint8_t fan_mode = frame[16];
   uint8_t swing_mode = frame[16];
-/*
-  if (fan_mode & 0xF)
-  switch (swing_mode & 0xF) {
-    case PANASONIC_SWING_AUTO:
-      this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
-      break;
-    default:
-      this->swing_mode = climate::CLIMATE_SWING_OFF;
-      break;
-  }
-  if ( (fan_mode & 0xF) == 15 )
-    this->swing_mode = climate::CLIMATE_SWING_OFF;
-  else
-    this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
-*/
 
   switch (fan_mode & 0xF) {
     case PANASONIC_SWING_AUTO:
