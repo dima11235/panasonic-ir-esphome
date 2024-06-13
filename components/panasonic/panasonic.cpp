@@ -99,9 +99,10 @@ uint16_t PanasonicClimate::fan_speed_() {
     case climate::CLIMATE_SWING_VERTICAL:
       fan_speed |= 0xF00;
       break;
-    default:
-      // set PANASONIC_SWING_HIGHEST position
+    case climate::CLIMATE_SWING_OFF:
       fan_speed |= 0x100;
+      break;
+    default:
       break;
   }
   return fan_speed;
