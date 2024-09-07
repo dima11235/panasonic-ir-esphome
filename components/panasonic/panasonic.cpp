@@ -6,6 +6,29 @@ namespace panasonic {
 
 static const char *TAG = "panasonic.climate";
 
+climate::ClimateTraits PanasonicClimate::traits() {
+  auto traits = climate::ClimateTraits();
+  traits.set_supports_current_temperature(this->sensor_ != nullptr);
+  traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_AUTO});
+  if (this->supports_cool_)
+    traits.add_supported_mode(climate::CLIMATE_MODE_COOL);
+  if (this->supports_heat_)
+    traits.add_supported_mode(climate::CLIMATE_MODE_HEAT);
+  if (this->supports_dry_)
+    traits.add_supported_mode(climate::CLIMATE_MODE_DRY);
+  if (this->supports_fan_only_)
+    traits.add_supported_mode(climate::CLIMATE_MODE_FAN_ONLY);
+
+  traits.set_supports_two_point_target_temperature(false);
+  traits.set_visual_min_temperature(this->minimum_temperature_);
+  traits.set_visual_max_temperature(this->maximum_temperature_);
+  traits.set_visual_temperature_step(this->temperature_step_);
+  traits.set_supported_fan_modes(this->fan_modes_);
+  traits.set_supported_swing_modes(this->swing_modes_);
+  traits.set_supported_presets(this->presets_);
+  return traits;
+}
+
 void PanasonicClimate::transmit_state() {
   uint8_t remote_state[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,
                               0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
