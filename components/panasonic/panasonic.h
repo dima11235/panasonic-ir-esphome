@@ -11,7 +11,7 @@ const uint8_t PANASONIC_TEMP_MIN = 16;  // Celsius
 const uint8_t PANASONIC_TEMP_MAX = 30;  // Celsius
 
 // Modes
-const uint8_t PANASONIC_MODE_AUTO = 0x00;
+const uint8_t PANASONIC_MODE_AUTO = 0x01;
 const uint8_t PANASONIC_MODE_COOL = 0x30;
 const uint8_t PANASONIC_MODE_HEAT = 0x40;
 const uint8_t PANASONIC_MODE_DRY = 0x20;
