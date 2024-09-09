@@ -81,6 +81,7 @@ uint8_t PanasonicClimate::operation_mode_() {
   uint8_t operating_mode = PANASONIC_MODE_ON;
   switch (this->mode) {
     case climate::CLIMATE_MODE_COOL:
+    case climate::CLIMATE_MODE_HEAT_COOL:
       operating_mode |= PANASONIC_MODE_COOL;
       break;
     case climate::CLIMATE_MODE_DRY:
