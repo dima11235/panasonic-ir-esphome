@@ -79,6 +79,15 @@ void PanasonicClimate::transmit_state() {
 
 uint8_t PanasonicClimate::operation_mode_() {
   uint8_t operating_mode = PANASONIC_MODE_ON;
+
+  if (this->mode == climate::CLIMATE_MODE_OFF) {
+    // Если кондиционер выключен, сохраняем предыдущий режим
+    this->mode = this->previous_mode;
+  } else {
+    // Если кондиционер включен, сохраняем текущий режим как previous_mode
+    this->previous_mode = this->mode;
+  }
+
   switch (this->mode) {
     case climate::CLIMATE_MODE_COOL:
       operating_mode |= PANASONIC_MODE_COOL;
