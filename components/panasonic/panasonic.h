@@ -69,9 +69,10 @@ class PanasonicClimate : public climate_ir::ClimateIR {
   // Handle received IR Buffer
   bool on_receive(remote_base::RemoteReceiveData data) override;
   bool parse_state_frame_(const uint8_t frame[]);
-};
-
+  
  private:
   climate::ClimateMode previous_mode; // Переменная для хранения предыдущего режима для восстановления при climate.turn_on
+};
+
 }  // namespace panasonic
 }  // namespace esphome
