@@ -79,9 +79,22 @@ void PanasonicClimate::transmit_state() {
 
 uint8_t PanasonicClimate::operation_mode_() {
   uint8_t operating_mode = PANASONIC_MODE_ON;
+
+  // Восстановление предыдущего режима при climate.turn_on (режим HEAT_COOL)
+  if (this->mode == climate::CLIMATE_MODE_HEAT_COOL) {
+    if (this->previous_mode != climate::CLIMATE_MODE_OFF) {
+      this->mode = this->previous_mode; // Устанавливаем в предыдущий режим
+    } else {
+      this->mode = climate::CLIMATE_MODE_COOL; // Если предыдущий режим не проинициализирован, то режим COOL
+    }
+  } 
+  // Cохраняем текущий режим в предыдущий
+  if (this->mode != climate::CLIMATE_MODE_OFF) {
+    this->previous_mode = this->mode;
+  }
+
   switch (this->mode) {
     case climate::CLIMATE_MODE_COOL:
-    case climate::CLIMATE_MODE_HEAT_COOL:
       operating_mode |= PANASONIC_MODE_COOL;
       break;
     case climate::CLIMATE_MODE_DRY:

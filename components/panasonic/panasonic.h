@@ -53,7 +53,8 @@ class PanasonicClimate : public climate_ir::ClimateIR {
       : climate_ir::ClimateIR(
             PANASONIC_TEMP_MIN, PANASONIC_TEMP_MAX, 1.0f, true, false,
             {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
-            {climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}) {}
+            {climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}),
+      previous_mode(climate::CLIMATE_MODE_OFF) {}
 
  protected:
   // Update the traits of this controller.
@@ -70,5 +71,7 @@ class PanasonicClimate : public climate_ir::ClimateIR {
   bool parse_state_frame_(const uint8_t frame[]);
 };
 
+ private:
+  climate::ClimateMode previous_mode; // Переменная для хранения предыдущего режима для восстановления при climate.turn_on
 }  // namespace panasonic
 }  // namespace esphome
