@@ -71,7 +71,7 @@ class PanasonicClimate : public climate_ir::ClimateIR {
   bool parse_state_frame_(const uint8_t frame[]);
   
  private:
-  climate::ClimateMode previous_mode; // Переменная для хранения предыдущего режима для восстановления при climate.turn_on
+  climate::ClimateMode previous_mode; // Remembers the last active mode so HEAT_COOL can restore it.
 };
 
 }  // namespace panasonic

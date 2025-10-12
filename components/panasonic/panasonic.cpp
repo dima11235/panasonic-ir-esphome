@@ -78,22 +78,18 @@ void PanasonicClimate::transmit_state() {
 }
 
 uint8_t PanasonicClimate::operation_mode_() {
-  uint8_t operating_mode = PANASONIC_MODE_ON;
-
-  // Восстановление предыдущего режима при climate.turn_on (режим HEAT_COOL)
-  if (this->mode == climate::CLIMATE_MODE_HEAT_COOL) {
-    if (this->previous_mode != climate::CLIMATE_MODE_OFF) {
-      this->mode = this->previous_mode; // Устанавливаем в предыдущий режим
-    } else {
-      this->mode = climate::CLIMATE_MODE_COOL; // Если предыдущий режим не проинициализирован, то режим COOL
-    }
-  } 
-  // Cохраняем текущий режим в предыдущий
-  if (this->mode != climate::CLIMATE_MODE_OFF) {
-    this->previous_mode = this->mode;
+  // Treat HEAT_COOL as a request to restore the previous operating mode.
+  climate::ClimateMode effective_mode = this->mode;
+  if (effective_mode == climate::CLIMATE_MODE_HEAT_COOL) {
+    effective_mode = (this->previous_mode != climate::CLIMATE_MODE_OFF) ? this->previous_mode
+                                                                        : climate::CLIMATE_MODE_COOL;
   }
-
-  switch (this->mode) {
+  if (effective_mode == climate::CLIMATE_MODE_OFF) {
+    return PANASONIC_MODE_OFF;
+  }
+  this->previous_mode = effective_mode;
+  uint8_t operating_mode = PANASONIC_MODE_ON;
+  switch (effective_mode) {
     case climate::CLIMATE_MODE_COOL:
       operating_mode |= PANASONIC_MODE_COOL;
       break;
@@ -106,12 +102,10 @@ uint8_t PanasonicClimate::operation_mode_() {
     case climate::CLIMATE_MODE_AUTO:
       operating_mode |= PANASONIC_MODE_AUTO;
       break;
-    case climate::CLIMATE_MODE_OFF:
     default:
       operating_mode = PANASONIC_MODE_OFF;
       break;
   }
-
   return operating_mode;
 }
 
@@ -165,31 +159,46 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
   if (frame[PANASONIC_STATE_FRAME_SIZE - 1] != checksum)
     return false;
   uint8_t mode = frame[13];
+  bool mode_updated = false;
+  climate::ClimateMode parsed_mode = this->mode;
+
   if (mode & PANASONIC_MODE_ON) {
     switch (mode & 0xF0) {
       case PANASONIC_MODE_COOL:
-        this->mode = climate::CLIMATE_MODE_COOL;
+        parsed_mode = climate::CLIMATE_MODE_COOL;
+        mode_updated = true;
         break;
       case PANASONIC_MODE_DRY:
-        this->mode = climate::CLIMATE_MODE_DRY;
+        parsed_mode = climate::CLIMATE_MODE_DRY;
+        mode_updated = true;
         break;
       case PANASONIC_MODE_HEAT:
-        this->mode = climate::CLIMATE_MODE_HEAT;
+        parsed_mode = climate::CLIMATE_MODE_HEAT;
+        mode_updated = true;
         break;
       case PANASONIC_MODE_AUTO:
-        this->mode = climate::CLIMATE_MODE_AUTO;
+        parsed_mode = climate::CLIMATE_MODE_AUTO;
+        mode_updated = true;
         break;
     }
   } else {
-    this->mode = climate::CLIMATE_MODE_OFF;
+    parsed_mode = climate::CLIMATE_MODE_OFF;
+    mode_updated = true;
   }
+
+  if (mode_updated) {
+    this->mode = parsed_mode;
+    if (parsed_mode != climate::CLIMATE_MODE_OFF) {
+      this->previous_mode = parsed_mode;
+    }
+  }
+
   uint8_t temperature = frame[14];
   if (!(temperature & 0xC0)) {
     this->target_temperature = temperature >> 1;
   }
   
   uint8_t fan_mode = frame[16];
-  uint8_t swing_mode = frame[16];
 
   switch (fan_mode & 0xF) {
     case PANASONIC_SWING_AUTO:
