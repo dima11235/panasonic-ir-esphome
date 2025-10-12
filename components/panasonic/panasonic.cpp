@@ -84,7 +84,6 @@ uint8_t PanasonicClimate::operation_mode_() {
                                                                     : climate::CLIMATE_MODE_COOL;
   }
   if (this->mode == climate::CLIMATE_MODE_OFF) {
-    this->previous_mode = climate::CLIMATE_MODE_OFF;
     return PANASONIC_MODE_OFF;
   }
   this->previous_mode = this->mode;
