@@ -188,9 +188,9 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
 
   if (mode_updated) {
     this->mode = parsed_mode;
-    if (parsed_mode != climate::CLIMATE_MODE_OFF) {
-      this->previous_mode = parsed_mode;
-    }
+  }
+  if (this->mode != climate::CLIMATE_MODE_OFF) {
+    this->previous_mode = this->mode;
   }
 
   uint8_t temperature = frame[14];
