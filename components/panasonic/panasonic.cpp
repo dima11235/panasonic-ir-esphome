@@ -79,17 +79,17 @@ void PanasonicClimate::transmit_state() {
 
 uint8_t PanasonicClimate::operation_mode_() {
   // Treat HEAT_COOL as a request to restore the previous operating mode.
-  climate::ClimateMode effective_mode = this->mode;
-  if (effective_mode == climate::CLIMATE_MODE_HEAT_COOL) {
-    effective_mode = (this->previous_mode != climate::CLIMATE_MODE_OFF) ? this->previous_mode
-                                                                        : climate::CLIMATE_MODE_COOL;
+  if (this->mode == climate::CLIMATE_MODE_HEAT_COOL) {
+    this->mode = (this->previous_mode != climate::CLIMATE_MODE_OFF) ? this->previous_mode
+                                                                    : climate::CLIMATE_MODE_COOL;
   }
-  if (effective_mode == climate::CLIMATE_MODE_OFF) {
+  if (this->mode == climate::CLIMATE_MODE_OFF) {
+    this->previous_mode = climate::CLIMATE_MODE_OFF;
     return PANASONIC_MODE_OFF;
   }
-  this->previous_mode = effective_mode;
+  this->previous_mode = this->mode;
   uint8_t operating_mode = PANASONIC_MODE_ON;
-  switch (effective_mode) {
+  switch (this->mode) {
     case climate::CLIMATE_MODE_COOL:
       operating_mode |= PANASONIC_MODE_COOL;
       break;
