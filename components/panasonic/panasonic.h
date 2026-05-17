@@ -49,12 +49,7 @@ const uint8_t PANASONIC_STATE_FRAME_SIZE = 27;
 
 class PanasonicClimate : public climate_ir::ClimateIR {
  public:
-  PanasonicClimate()
-      : climate_ir::ClimateIR(
-            PANASONIC_TEMP_MIN, PANASONIC_TEMP_MAX, 1.0f, true, false,
-            {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
-            {climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL}),
-      previous_mode(climate::CLIMATE_MODE_OFF) {}
+  PanasonicClimate();
 
  protected:
   // Update the traits of this controller.
@@ -62,6 +57,7 @@ class PanasonicClimate : public climate_ir::ClimateIR {
 
   // Transmit via IR the state of this climate controller.
   void transmit_state() override;
+  void control(const climate::ClimateCall &call) override;
   uint8_t operation_mode_();
   uint8_t fan_swing_();
   uint8_t temperature_();
