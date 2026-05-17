@@ -63,15 +63,15 @@ class PanasonicClimate : public climate_ir::ClimateIR {
   // Transmit via IR the state of this climate controller.
   void transmit_state() override;
   uint8_t operation_mode_();
-  uint16_t fan_speed_();
+  uint8_t fan_swing_();
   uint8_t temperature_();
 
   // Handle received IR Buffer
   bool on_receive(remote_base::RemoteReceiveData data) override;
   bool parse_state_frame_(const uint8_t frame[]);
-  
+
  private:
-  climate::ClimateMode previous_mode; // Remembers the last active mode so HEAT_COOL can restore it.
+  climate::ClimateMode previous_mode;  // Last real Panasonic operating mode, used by virtual HEAT_COOL.
 };
 
 }  // namespace panasonic
