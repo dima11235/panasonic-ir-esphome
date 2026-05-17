@@ -23,6 +23,12 @@ static const char *const PANASONIC_CUSTOM_FAN_3 = "3";
 static const char *const PANASONIC_CUSTOM_FAN_4 = "4";
 static const char *const PANASONIC_CUSTOM_FAN_5 = "5";
 
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGHEST = "swing_highest";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGH = "swing_high";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_MIDDLE = "swing_middle";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOW = "swing_low";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOWEST = "swing_lowest";
+
 static const uint8_t PANASONIC_STATE_TEMPLATE[PANASONIC_STATE_FRAME_SIZE] = {
     0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02, 0x20, 0xE0, 0x04, 0x00, 0x00,
     0x00, 0x80, 0x00, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00};
@@ -62,7 +68,7 @@ static void panasonic_log_frame(const uint8_t frame[]) {
   ESP_LOGI(TAG, "Panasonic IR dump: %s", buffer);
 }
 
-static bool panasonic_custom_fan_is(StringRef mode, const char *expected) {
+static bool panasonic_string_is(StringRef mode, const char *expected) {
   return mode.size() == std::strlen(expected) && std::strncmp(mode.c_str(), expected, mode.size()) == 0;
 }
 
@@ -73,6 +79,9 @@ PanasonicClimate::PanasonicClimate()
       previous_mode(climate::CLIMATE_MODE_OFF) {
   this->set_supported_custom_fan_modes({PANASONIC_CUSTOM_FAN_1, PANASONIC_CUSTOM_FAN_2, PANASONIC_CUSTOM_FAN_3,
                                         PANASONIC_CUSTOM_FAN_4, PANASONIC_CUSTOM_FAN_5});
+  this->set_supported_custom_presets({PANASONIC_CUSTOM_PRESET_SWING_HIGHEST, PANASONIC_CUSTOM_PRESET_SWING_HIGH,
+                                      PANASONIC_CUSTOM_PRESET_SWING_MIDDLE, PANASONIC_CUSTOM_PRESET_SWING_LOW,
+                                      PANASONIC_CUSTOM_PRESET_SWING_LOWEST});
 }
 
 climate::ClimateTraits PanasonicClimate::traits() {
@@ -96,11 +105,20 @@ void PanasonicClimate::control(const climate::ClimateCall &call) {
       this->set_fan_mode_(*fan_mode);
   }
   auto swing_mode = call.get_swing_mode();
-  if (swing_mode.has_value())
+  if (swing_mode.has_value()) {
     this->swing_mode = *swing_mode;
-  auto preset = call.get_preset();
-  if (preset.has_value())
-    this->preset = preset;
+    if (this->swing_mode == climate::CLIMATE_SWING_VERTICAL) {
+      this->clear_custom_preset_();
+    }
+  }
+  if (call.has_custom_preset()) {
+    this->set_custom_preset_(call.get_custom_preset());
+    this->swing_mode = climate::CLIMATE_SWING_OFF;
+  } else {
+    auto preset = call.get_preset();
+    if (preset.has_value())
+      this->set_preset_(*preset);
+  }
   this->transmit_state();
   this->publish_state();
 }
@@ -182,15 +200,15 @@ uint8_t PanasonicClimate::fan_swing_() {
   uint8_t fan_swing = PANASONIC_FAN_AUTO;
   if (this->has_custom_fan_mode()) {
     auto custom_fan = this->get_custom_fan_mode();
-    if (panasonic_custom_fan_is(custom_fan, PANASONIC_CUSTOM_FAN_1)) {
+    if (panasonic_string_is(custom_fan, PANASONIC_CUSTOM_FAN_1)) {
       fan_swing = PANASONIC_FAN_1;
-    } else if (panasonic_custom_fan_is(custom_fan, PANASONIC_CUSTOM_FAN_2)) {
+    } else if (panasonic_string_is(custom_fan, PANASONIC_CUSTOM_FAN_2)) {
       fan_swing = PANASONIC_FAN_2;
-    } else if (panasonic_custom_fan_is(custom_fan, PANASONIC_CUSTOM_FAN_3)) {
+    } else if (panasonic_string_is(custom_fan, PANASONIC_CUSTOM_FAN_3)) {
       fan_swing = PANASONIC_FAN_3;
-    } else if (panasonic_custom_fan_is(custom_fan, PANASONIC_CUSTOM_FAN_4)) {
+    } else if (panasonic_string_is(custom_fan, PANASONIC_CUSTOM_FAN_4)) {
       fan_swing = PANASONIC_FAN_4;
-    } else if (panasonic_custom_fan_is(custom_fan, PANASONIC_CUSTOM_FAN_5)) {
+    } else if (panasonic_string_is(custom_fan, PANASONIC_CUSTOM_FAN_5)) {
       fan_swing = PANASONIC_FAN_5;
     }
   } else if (this->fan_mode.has_value()) {
@@ -208,7 +226,24 @@ uint8_t PanasonicClimate::fan_swing_() {
       break;
     case climate::CLIMATE_SWING_OFF:
     default:
-      fan_swing |= PANASONIC_SWING_HIGHEST;
+      if (this->has_custom_preset()) {
+        auto custom_preset = this->get_custom_preset();
+        if (panasonic_string_is(custom_preset, PANASONIC_CUSTOM_PRESET_SWING_HIGHEST)) {
+          fan_swing |= PANASONIC_SWING_HIGHEST;
+        } else if (panasonic_string_is(custom_preset, PANASONIC_CUSTOM_PRESET_SWING_HIGH)) {
+          fan_swing |= PANASONIC_SWING_HIGH;
+        } else if (panasonic_string_is(custom_preset, PANASONIC_CUSTOM_PRESET_SWING_MIDDLE)) {
+          fan_swing |= PANASONIC_SWING_MIDDLE;
+        } else if (panasonic_string_is(custom_preset, PANASONIC_CUSTOM_PRESET_SWING_LOW)) {
+          fan_swing |= PANASONIC_SWING_LOW;
+        } else if (panasonic_string_is(custom_preset, PANASONIC_CUSTOM_PRESET_SWING_LOWEST)) {
+          fan_swing |= PANASONIC_SWING_LOWEST;
+        } else {
+          fan_swing |= PANASONIC_SWING_HIGHEST;
+        }
+      } else {
+        fan_swing |= PANASONIC_SWING_HIGHEST;
+      }
       break;
   }
   return fan_swing;
@@ -253,6 +288,8 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
   climate::ClimateMode parsed_mode;
   float parsed_target_temperature = this->target_temperature;
   climate::ClimateSwingMode parsed_swing_mode = this->swing_mode;
+  bool parsed_custom_preset = false;
+  const char *parsed_custom_preset_mode = nullptr;
   bool parsed_custom_fan = false;
   const char *parsed_custom_fan_mode = nullptr;
   climate::ClimateFanMode parsed_fan_mode = climate::CLIMATE_FAN_AUTO;
@@ -299,10 +336,30 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
       parsed_swing_mode = climate::CLIMATE_SWING_VERTICAL;
       break;
     case PANASONIC_SWING_HIGHEST:
+      parsed_swing_mode = climate::CLIMATE_SWING_OFF;
+      parsed_custom_preset = true;
+      parsed_custom_preset_mode = PANASONIC_CUSTOM_PRESET_SWING_HIGHEST;
+      break;
     case PANASONIC_SWING_HIGH:
+      parsed_swing_mode = climate::CLIMATE_SWING_OFF;
+      parsed_custom_preset = true;
+      parsed_custom_preset_mode = PANASONIC_CUSTOM_PRESET_SWING_HIGH;
+      break;
     case PANASONIC_SWING_MIDDLE:
+      parsed_swing_mode = climate::CLIMATE_SWING_OFF;
+      parsed_custom_preset = true;
+      parsed_custom_preset_mode = PANASONIC_CUSTOM_PRESET_SWING_MIDDLE;
+      break;
     case PANASONIC_SWING_LOW:
+      parsed_swing_mode = climate::CLIMATE_SWING_OFF;
+      parsed_custom_preset = true;
+      parsed_custom_preset_mode = PANASONIC_CUSTOM_PRESET_SWING_LOW;
+      break;
     case PANASONIC_SWING_LOWEST:
+      parsed_swing_mode = climate::CLIMATE_SWING_OFF;
+      parsed_custom_preset = true;
+      parsed_custom_preset_mode = PANASONIC_CUSTOM_PRESET_SWING_LOWEST;
+      break;
     default:
       parsed_swing_mode = climate::CLIMATE_SWING_OFF;
       break;
@@ -341,6 +398,11 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
   this->mode = parsed_mode;
   this->target_temperature = parsed_target_temperature;
   this->swing_mode = parsed_swing_mode;
+  if (parsed_custom_preset) {
+    this->set_custom_preset_(parsed_custom_preset_mode);
+  } else {
+    this->clear_custom_preset_();
+  }
   if (parsed_custom_fan) {
     this->set_custom_fan_mode_(parsed_custom_fan_mode);
   } else {
@@ -350,10 +412,13 @@ bool PanasonicClimate::parse_state_frame_(const uint8_t frame[]) {
     this->previous_mode = this->mode;
   }
 
-  if (this->has_custom_fan_mode()) {
+  if (this->has_custom_fan_mode() || this->has_custom_preset()) {
     auto custom_fan = this->get_custom_fan_mode();
-    ESP_LOGD(TAG, "Received state: mode=%d target=%.1f custom_fan=%.*s swing=%d", static_cast<int>(this->mode),
+    auto custom_preset = this->get_custom_preset();
+    ESP_LOGD(TAG, "Received state: mode=%d target=%.1f custom_fan=%.*s preset=%.*s swing=%d",
+             static_cast<int>(this->mode),
              this->target_temperature, static_cast<int>(custom_fan.size()), custom_fan.c_str(),
+             static_cast<int>(custom_preset.size()), custom_preset.c_str(),
              static_cast<int>(this->swing_mode));
   } else {
     ESP_LOGD(TAG, "Received state: mode=%d target=%.1f fan=%d swing=%d", static_cast<int>(this->mode),
