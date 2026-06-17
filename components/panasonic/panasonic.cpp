@@ -23,11 +23,11 @@ static const char *const PANASONIC_CUSTOM_FAN_3 = "3";
 static const char *const PANASONIC_CUSTOM_FAN_4 = "4";
 static const char *const PANASONIC_CUSTOM_FAN_5 = "5";
 
-static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGHEST = "swing_highest";
-static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGH = "swing_high";
-static const char *const PANASONIC_CUSTOM_PRESET_SWING_MIDDLE = "swing_middle";
-static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOW = "swing_low";
-static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOWEST = "swing_lowest";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGHEST = "Верхнее";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_HIGH = "Верхне-среднее";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_MIDDLE = "Среднее";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOW = "Нижне-среднее";
+static const char *const PANASONIC_CUSTOM_PRESET_SWING_LOWEST = "Нижнее";
 
 static const uint8_t PANASONIC_STATE_TEMPLATE[PANASONIC_STATE_FRAME_SIZE] = {
     0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02, 0x20, 0xE0, 0x04, 0x00, 0x00,
